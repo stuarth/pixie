@@ -211,6 +211,7 @@
     (f/defcfn uv_tcp_bind)
     (f/defcfn uv_listen)
     (f/defcfn uv_accept)
+    (f/defcfn uv_ip4_name)
     (f/defcfn uv_tcp_connect)
     (f/defcfn uv_tcp_keepalive)
     (f/defcfn uv_read_start)
@@ -219,6 +220,20 @@
     (f/defccallback uv_connection_cb)
     (f/defccallback uv_connect_cb)
 
+    ; UDP Networking
+    (f/defconst UV_UDP_REUSEADDR)
+    (f/defcstruct uv_udp_t [])
+    (f/defcstruct uv_udp_send_t [])
+    (f/defcfn uv_udp_init)
+    (f/defcfn uv_ip4_addr)
+    (f/defcfn uv_udp_bind)
+    (f/defcfn uv_udp_recv_start)
+    (f/defcfn uv_udp_set_broadcast)
+    (f/defcfn uv_udp_send)
+    (f/defcfn uv_udp_recv_stop)
+    (f/defccallback uv_udp_send_cb)
+    (f/defccallback uv_udp_recv_cb)
+    
     (f/defccallback uv_alloc_cb)
     (f/defccallback uv_read_cb))
 

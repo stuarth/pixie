@@ -4,7 +4,8 @@
             [pixie.io.common :as common]
             [pixie.uv :as uv]
             [pixie.io.uv-common :as uv-common]
-            [pixie.ffi :as ffi]))
+            [pixie.ffi :as ffi]
+            [pixie.io.ip :as ip]))
 
 (defrecord TCPServer [ip port on-connect uv-server bind-addr on-connection-cb]
   IDisposable
@@ -43,12 +44,8 @@
   "Creates a TCP server on the given ip (as a string) and port (as an integer). Returns a TCPServer that can be
   shutdown with dispose!. on-connection is a function that will be passed a TCPStream for each connecting client."
   [ip port on-connection]
-    (assert (string? ip) "Ip should be a string")
-    (assert (integer? port) "Port should be a int")
-
-    (let [server (uv/uv_tcp_t)
-          bind-addr (uv/sockaddr_in)
-          _ (uv/throw-on-error (uv/uv_ip4_addr ip port bind-addr))
+  (let [server (uv/uv_tcp_t)
+          bind-addr (ip/ip4-sock-addr ip port)
           on-new-connection (atom nil)
           tcp-server (->TCPServer ip port on-connection server bind-addr on-new-connection)]
       (reset! on-new-connection
@@ -66,11 +63,10 @@
 (defn tcp-client
   "Creates a TCP connection to the given ip (as a string) and port (an integer). Will return a TCPStream"
   [ip port]
-  (let [client-addr (uv/sockaddr_in)
+  (let [client-addr (ip/ip4-sock-addr ip port)
         uv-connect (uv/uv_connect_t)
         client (uv/uv_tcp_t)
         cb (atom nil)]
-    (uv/throw-on-error (uv/uv_ip4_addr ip port client-addr))
     (uv/uv_tcp_init (uv/uv_default_loop) client)
     (st/call-cc (fn [k]
                (reset! cb (ffi/ffi-prep-callback
